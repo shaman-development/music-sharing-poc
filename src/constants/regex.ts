@@ -1,0 +1,1 @@
+export const REGEX_SONG_ID_FROM_URL = /(?<=track\/)[^\?]+/g

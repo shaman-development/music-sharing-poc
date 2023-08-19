@@ -24,7 +24,7 @@ export default defineConfig({
         name: 'MusicMind',
         short_name: 'MusicMind',
         description: 'MusicMind - share what plays in your mind',
-        theme_color: '#0af2f2',
+        theme_color: '#00BD7E',
         icons: [
           {
             src: 'pwa-64x64.png',
