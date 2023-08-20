@@ -33,5 +33,5 @@ suggestPostingNotification();
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  self.clients.openWindow(import.meta.env.BASE_URL + '/create-post');
+  self.clients.openWindow(import.meta.env.BASE_URL + '#/create-post');
 })
