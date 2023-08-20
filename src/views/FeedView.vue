@@ -6,6 +6,7 @@ import { storeToRefs } from 'pinia'
 import NotificationBanner from '@/components/NotificationBanner.vue'
 import SinglePost from '@/components/SinglePost.vue'
 import type { Post } from '@/types/common.types'
+import SkeletonLoader from "@/components/SkeletonLoader.vue";
 
 const userStore = useUser()
 const { profile, followIds } = storeToRefs(userStore)
@@ -17,7 +18,9 @@ const feed = reactive<Post[]>([])
 const errorMessage = ref();
 const isEverythingLoaded = ref(false);
 
+const isFeedLoading = ref(true);
 const fetchFeedPage = async () => {
+  isFeedLoading.value = true;
   const { data, error } = await supabase
     .from('detailed_posts')
     .select()
@@ -29,13 +32,20 @@ const fetchFeedPage = async () => {
     // TODO: Probably possible to optimize
     // .range(feed.length, feed.length + PAGE_SIZE - 1)
 
-  if (error) return (errorMessage.value = error.message)
+  if (error) {
+    isFeedLoading.value = false
+    return (errorMessage.value = error.message)
+  }
 
-  if(!data.length) return (isEverythingLoaded.value = true);
+  if(!data.length) {
+    isFeedLoading.value = false
+    return (isEverythingLoaded.value = true);
+  }
 
   feed.push(...(data as Post[]))
 
-  if (data.length < 10) return (isEverythingLoaded.value = true);
+  isFeedLoading.value = false
+  if (data.length < 10) return (isEverythingLoaded.value = true);;
 }
 
 fetchFeedPage()
@@ -47,8 +57,8 @@ fetchFeedPage()
       ><p>{{ errorMessage }}</p></NotificationBanner
     >
     <div>
-      <p v-if="!feed?.length" class="feed-view__empty">There is nothing on your feed yet.</p>
-      <div v-else>
+      <p v-if="!feed?.length && !isFeedLoading" class="feed-view__empty">There is nothing on your feed yet.</p>
+      <div v-else-if="feed.length">
         <SinglePost
           v-for="{ post_id, created_at, content, author_id, author_username } in feed"
           :key="post_id"
@@ -60,6 +70,11 @@ fetchFeedPage()
         />
         <button v-if="!isEverythingLoaded" @click="fetchFeedPage" class="feed-view__load-more">Load more posts</button>
         <p v-else @click="fetchFeedPage" class="feed-view__done">That's all for now</p>
+      </div>
+      <div v-if="isFeedLoading">
+        <SkeletonLoader class="feed-view__post" />
+        <SkeletonLoader class="feed-view__post" />
+        <SkeletonLoader class="feed-view__post" />
       </div>
     </div>
   </div>

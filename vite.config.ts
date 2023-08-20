@@ -26,7 +26,8 @@ export default defineConfig({
         description: 'MusicMind - share what plays in your mind',
         theme_color: '#00BD7E',
         share_target: {
-          action: '/create-post',
+          enctype: 'application/x-www-form-urlencoded',
+          action: '/music-sharing-poc/#/create-post',
           method: 'GET',
           params: {
             url: 'url'

@@ -5,6 +5,7 @@ import SinglePost from '@/components/SinglePost.vue'
 import { useUser } from '@/stores/user'
 import supabase from '@/plugins/supabase'
 import NotificationBanner from '@/components/NotificationBanner.vue'
+import LoadingAnimation from '@/components/LoadingAnimation.vue'
 import {useRoute} from "vue-router";
 
 const route = useRoute();
@@ -14,16 +15,22 @@ const url = ref(sharedUrl);
 
 const errorMessage = ref()
 const isSuccess = ref(false);
+const isSubmittingPost = ref(false);
 const handleSubmit = async () => {
   if (!hasSongId.value) return
+  isSubmittingPost.value = true;
   errorMessage.value = null
-  isSuccess.value = true;
+  isSuccess.value = false;
 
   const { error } = await supabase.from('posts').insert({ content: url.value })
   if (error) {
     errorMessage.value = error?.message
     isSuccess.value = false;
   }
+
+  isSuccess.value = true;
+  isSubmittingPost.value = false;
+  url.value = '';
 }
 
 const hasSongId = computed(() => !!getSongIdFromUrl(url.value))
@@ -47,7 +54,10 @@ const { username } = useUser()
         <input v-model="url" type="text" required />
       </div>
 
-      <button :disabled="!hasSongId" type="submit">Submit</button>
+      <button :disabled="!hasSongId || isSubmittingPost" type="submit">
+        <LoadingAnimation v-if="isSubmittingPost" />
+        <span v-else>Submit</span>
+      </button>
     </form>
     <SinglePost
       v-if="hasSongId && username"

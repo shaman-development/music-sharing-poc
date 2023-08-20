@@ -1,46 +1,52 @@
 <script setup lang="ts">
-import {RouterView, useRouter} from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
 import supabase from '@/plugins/supabase'
-import {ROUTE_NAME} from '@/constants/router'
-import {useUser} from '@/stores/user'
-import {storeToRefs} from 'pinia'
-import {onMounted, ref} from "vue";
-import {isNotificationPermitted, requestPermission} from "@/utils/notifications";
-import ReloadPrompt from '@/components/ReloadPrompt.vue'
-import NotificationPermissionPrompt from "@/components/NotificationPermissionPrompt.vue";
+import { ROUTE_NAME } from '@/constants/router'
+import { useUser } from '@/stores/user'
+import { storeToRefs } from 'pinia'
+import { onMounted, ref } from 'vue'
+import { requestPermission } from '@/utils/notifications'
+import NotificationPermissionPrompt from '@/components/NotificationPermissionPrompt.vue'
 
 const router = useRouter()
 const userStore = useUser()
-const {user, profile} = storeToRefs(userStore)
-const {clearUser} = userStore
+const { user, profile } = storeToRefs(userStore)
+const { clearUser } = userStore
 const handleLogout = async () => {
-  const {error} = await supabase.auth.signOut()
+  const { error } = await supabase.auth.signOut()
 
   if (error) return console.error(error)
 
   clearUser()
-  router.push({name: ROUTE_NAME.LOGIN})
+  router.push({ name: ROUTE_NAME.LOGIN })
 }
 
-const isNavigationOpen = ref(false);
+const isNavigationOpen = ref(false)
 
+const isNotificationPromptVisible = ref(false)
 onMounted(async () => {
-  await requestPermission();
+  await requestPermission()
+
+  setTimeout(() => (isNotificationPromptVisible.value = true), 1000 * 60 * 5)
 })
 </script>
 
 <template>
-<!--  <ReloadPrompt />-->
+  <!--  <ReloadPrompt />-->
   <NotificationPermissionPrompt />
 
   <header class="header">
     <RouterLink class="header__link" :to="{ name: ROUTE_NAME.FEED }">
-      <img alt="Vue logo" class="header__logo" src="/logo.svg" width="125" height="125"/>
+      <img alt="Vue logo" class="header__logo" src="/logo.svg" width="125" height="125" />
     </RouterLink>
   </header>
 
   <template v-if="user">
-    <button @click="isNavigationOpen = !isNavigationOpen" class="navigation__toggle" :class="{ 'navigation__toggle--open': isNavigationOpen }">
+    <button
+      @click="isNavigationOpen = !isNavigationOpen"
+      class="navigation__toggle"
+      :class="{ 'navigation__toggle--open': isNavigationOpen }"
+    >
       <span class="navigation__hamburger">
         <span class="navigation__hamburger-line"></span>
         <span class="navigation__hamburger-line"></span>
@@ -51,18 +57,17 @@ onMounted(async () => {
       <ul class="navigation__list">
         <li class="navigation__element">
           <RouterLink class="navigation__link" :to="{ name: ROUTE_NAME.CREATE_POST }"
-          >Add post
-          </RouterLink
-          >
+            >Add post
+          </RouterLink>
         </li>
         <li class="navigation__element">
           <RouterLink class="navigation__link" :to="{ name: ROUTE_NAME.FEED }">Feed</RouterLink>
         </li>
         <li class="navigation__element">
           <RouterLink
-              class="navigation__link"
-              :to="{ name: ROUTE_NAME.PROFILE, params: { id: user.id } }"
-          >My profile
+            class="navigation__link"
+            :to="{ name: ROUTE_NAME.PROFILE, params: { id: user.id } }"
+            >My profile
           </RouterLink>
         </li>
         <li class="navigation__element">
@@ -70,16 +75,14 @@ onMounted(async () => {
         </li>
         <li class="navigation__element">
           <RouterLink class="navigation__link" :to="{ name: ROUTE_NAME.SETTINGS }"
-          >Settings
-          </RouterLink
-          >
+            >Settings
+          </RouterLink>
         </li>
         <li class="navigation__element">
           <button class="navigation__logout" @click="handleLogout">Logout</button>
         </li>
       </ul>
     </nav>
-
 
     <div v-if="profile" class="greeting">
       <h1 class="greeting__heading">
@@ -89,7 +92,7 @@ onMounted(async () => {
   </template>
 
   <main class="main">
-    <RouterView/>
+    <RouterView />
   </main>
 </template>
 
@@ -156,15 +159,15 @@ onMounted(async () => {
     background: var(--color-background-soft);
     cursor: pointer;
 
-    &--open .navigation__hamburger-line:nth-child(2){
+    &--open .navigation__hamburger-line:nth-child(2) {
       opacity: 0;
     }
 
-    &--open .navigation__hamburger-line:nth-child(1){
+    &--open .navigation__hamburger-line:nth-child(1) {
       transform: translateY(10px) rotate(45deg);
     }
 
-    &--open .navigation__hamburger-line:nth-child(3){
+    &--open .navigation__hamburger-line:nth-child(3) {
       transform: translateY(-10px) rotate(-45deg);
     }
   }
