@@ -6,11 +6,17 @@ import {
   isNotificationSupported,
   requestPermission
 } from "@/utils/notifications";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 
 const isSupported = ref(isNotificationSupported());
 const isPermitted = ref(isNotificationPermitted());
 const isDenied = ref(isNotificationDenied());
+
+onMounted(() => {
+  isSupported.value = isNotificationSupported();
+  isPermitted.value = isNotificationPermitted();
+  isDenied.value = isNotificationDenied();
+})
 
 const responded = ref(false);
 

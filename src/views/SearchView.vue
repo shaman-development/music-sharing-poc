@@ -3,21 +3,27 @@ import { ref } from 'vue'
 import supabase from '@/plugins/supabase'
 import NotificationBanner from '@/components/NotificationBanner.vue'
 import { ROUTE_NAME } from '@/constants/router'
+import LoadingAnimation from "@/components/LoadingAnimation.vue";
 
 const searchField = ref('')
 const errorMessage = ref()
 const results = ref()
+const isSearching = ref(false);
 const handleSearch = async () => {
-  if (!searchField.value) return
-
+  if (!searchField.value || isSearching.value) return
+  isSearching.value = true;
   errorMessage.value = null
   const { data, error } = await supabase
     .from('profiles')
     .select()
-    .like('username', `%${searchField.value}%`)
+    .ilike('username', `%${searchField.value}%`)
 
-  if (error) errorMessage.value = error.message
+  if (error) {
+    isSearching.value = false;
+    return errorMessage.value = error.message
+  }
   results.value = data
+  isSearching.value = false;
 }
 </script>
 <template>
@@ -31,7 +37,10 @@ const handleSearch = async () => {
         <label for="searchField">Username</label>
         <input v-model="searchField" id="searchField" type="text" />
       </div>
-      <button type="submit">Search</button>
+      <button :disabled="isSearching" type="submit">
+        <LoadingAnimation v-if="isSearching" />
+        <span v-else>Submit</span>
+      </button>
     </form>
     <div v-if="results" class="results">
       <h2>Found users</h2>

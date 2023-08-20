@@ -5,15 +5,16 @@ import supabase from '@/plugins/supabase'
 import { storeToRefs } from 'pinia'
 import NotificationBanner from '@/components/NotificationBanner.vue'
 import SinglePost from '@/components/SinglePost.vue'
-import type { Post } from '@/types/common.types'
+import type {DetailedPost} from '@/types/common.types'
 import SkeletonLoader from "@/components/SkeletonLoader.vue";
+import LoadingAnimation from "@/components/LoadingAnimation.vue";
 
 const userStore = useUser()
 const { profile, followIds } = storeToRefs(userStore)
 
 const PAGE_SIZE = 10
 
-const feed = reactive<Post[]>([])
+const feed = reactive<DetailedPost[]>([])
 
 const errorMessage = ref();
 const isEverythingLoaded = ref(false);
@@ -42,10 +43,10 @@ const fetchFeedPage = async () => {
     return (isEverythingLoaded.value = true);
   }
 
-  feed.push(...(data as Post[]))
+  feed.push(...(data as DetailedPost[]))
 
   isFeedLoading.value = false
-  if (data.length < 10) return (isEverythingLoaded.value = true);;
+  if (data.length < PAGE_SIZE) return (isEverythingLoaded.value = true);
 }
 
 fetchFeedPage()
@@ -68,8 +69,12 @@ fetchFeedPage()
           :created-at="created_at"
           class="feed-view__post"
         />
-        <button v-if="!isEverythingLoaded" @click="fetchFeedPage" class="feed-view__load-more">Load more posts</button>
-        <p v-else @click="fetchFeedPage" class="feed-view__done">That's all for now</p>
+        <button v-if="!isEverythingLoaded" :disabled="isFeedLoading" @click="fetchFeedPage" class="feed-view__load-more">
+
+          <LoadingAnimation v-if="isFeedLoading" />
+          <span v-else>Load more posts</span>
+        </button>
+        <p v-else class="feed-view__done">That's all for now</p>
       </div>
       <div v-if="isFeedLoading">
         <SkeletonLoader class="feed-view__post" />
@@ -84,6 +89,7 @@ fetchFeedPage()
 .feed-view {
   &__load-more {
     width: 100%;
+    margin-bottom: 1rem;
   }
 
   &__empty {

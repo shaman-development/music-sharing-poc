@@ -6,4 +6,5 @@ export type RequiredProperties<Type> = {
 
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Follow = RequiredProperties<Database['public']['Views']['detailed_follows']['Row']>
-export type Post = RequiredProperties<Database['public']['Views']['detailed_posts']['Row']>
+export type DetailedPost = RequiredProperties<Database['public']['Views']['detailed_posts']['Row']>
+export type Post = Database['public']['Tables']['posts']['Row']

@@ -7,6 +7,6 @@ export const requestPermission = async () => {
     if (!isNotificationSupported())
         return
 
-    if ('permission' in Notification && Notification.permission !== 'denied')
+    if ('permission' in Notification && Notification.permission !== 'denied' && Notification.permission !== 'granted')
         return await Notification.requestPermission()
 }

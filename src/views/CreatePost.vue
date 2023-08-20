@@ -20,7 +20,7 @@ const errorMessage = ref()
 const isSuccess = ref(false)
 const isSubmittingPost = ref(false)
 const handleSubmit = async () => {
-  if (!hasSongId.value) return
+  if (!hasSongId.value || isSubmittingPost.value) return
   isSubmittingPost.value = true
   errorMessage.value = null
   isSuccess.value = false
@@ -29,6 +29,8 @@ const handleSubmit = async () => {
   if (error) {
     errorMessage.value = error?.message
     isSuccess.value = false
+    isSubmittingPost.value = false;
+    return;
   }
 
   isSuccess.value = true

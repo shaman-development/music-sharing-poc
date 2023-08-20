@@ -4,6 +4,7 @@ import {storeToRefs} from "pinia";
 import {onMounted, ref, toValue} from "vue";
 import NotificationBanner from "@/components/NotificationBanner.vue";
 import supabase from "@/plugins/supabase";
+import LoadingAnimation from "@/components/LoadingAnimation.vue";
 
 const userStore = useUser();
 const { profile } = storeToRefs(userStore);
@@ -11,9 +12,11 @@ const { profile } = storeToRefs(userStore);
 const usernameValue = ref(toValue(profile.value?.username));
 const errorMessage = ref();
 const isSuccess = ref(false);
-
+const isChangingUsername = ref(false);
 const handleUsernameChange = async () => {
-  if(!profile.value?.id) return;
+  if(!profile.value?.id || isChangingUsername.value) return;
+
+  isChangingUsername.value = true;
   if (!usernameValue.value) return errorMessage.value = 'Username cannot be empty';
 
   errorMessage.value = null;
@@ -21,10 +24,14 @@ const handleUsernameChange = async () => {
 
   const { error } = await supabase.from('profiles').update({ username: usernameValue.value }).eq('id', profile.value.id);
 
-  if (error) return errorMessage.value = error.message;
+  if (error) {
+    isChangingUsername.value = false;
+    return errorMessage.value = error.message;
+  }
 
   profile.value.username = usernameValue.value;
   isSuccess.value = true;
+  isChangingUsername.value = false;
 }
 
 
@@ -34,7 +41,6 @@ const handleUsernameChange = async () => {
   <div>
     <h1 class="green">Settings</h1>
 
-    <h2>Change username</h2>
     <NotificationBanner v-if="errorMessage" type="error">
       <p>{{ errorMessage }}</p>
     </NotificationBanner>
@@ -46,7 +52,10 @@ const handleUsernameChange = async () => {
         <label for="username">Username</label>
         <input v-model="usernameValue" id="username" type="text" required />
       </div>
-      <button type="submit">Change username</button>
+      <button :disabled="isChangingUsername" type="submit">
+        <LoadingAnimation v-if="isChangingUsername" />
+        <span v-else>Change username</span>
+      </button>
     </form>
   </div>
 </template>

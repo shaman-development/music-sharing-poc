@@ -33,7 +33,7 @@ onMounted(async () => {
 
 <template>
   <!--  <ReloadPrompt />-->
-  <NotificationPermissionPrompt />
+  <NotificationPermissionPrompt v-if="isNotificationPromptVisible" />
 
   <header class="header">
     <RouterLink class="header__link" :to="{ name: ROUTE_NAME.FEED }">

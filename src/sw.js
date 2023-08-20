@@ -28,7 +28,7 @@ async function suggestPostingNotification() {
   setTimeout(suggestPostingNotification, NOTIFICATION_DELAY)
 }
 
-suggestPostingNotification();
+setTimeout(suggestPostingNotification, 1000 * 60 * 10)
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
