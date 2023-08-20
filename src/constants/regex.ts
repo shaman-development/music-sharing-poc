@@ -1,1 +1,1 @@
-export const REGEX_SONG_ID_FROM_URL = /(?<=track\/)[^\?]+/g
+export const REGEX_SONG_ID_FROM_URL = /track\/([A-Za-z0-9]+)/i
