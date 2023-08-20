@@ -25,6 +25,13 @@ export default defineConfig({
         short_name: 'MusicMind',
         description: 'MusicMind - share what plays in your mind',
         theme_color: '#00BD7E',
+        share_target: {
+          action: '/create-post',
+          method: 'GET',
+          params: {
+            url: 'url'
+          }
+        },
         icons: [
           {
             src: 'pwa-64x64.png',

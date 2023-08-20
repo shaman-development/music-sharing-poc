@@ -5,8 +5,12 @@ import SinglePost from '@/components/SinglePost.vue'
 import { useUser } from '@/stores/user'
 import supabase from '@/plugins/supabase'
 import NotificationBanner from '@/components/NotificationBanner.vue'
+import {useRoute} from "vue-router";
 
-const url = ref()
+const route = useRoute();
+
+const sharedUrl = (typeof route.query?.url === 'string' && route.query?.url) || ''
+const url = ref(sharedUrl);
 
 const errorMessage = ref()
 const isSuccess = ref(false);

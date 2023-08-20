@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import { ROUTE_NAME } from '@/constants/router'
-import supabase from "@/plugins/supabase";
-import {useUser} from "@/stores/user";
-import {storeToRefs} from "pinia";
+import supabase from '@/plugins/supabase'
+import { useUser } from '@/stores/user'
+import { storeToRefs } from 'pinia'
 
 declare module 'vue-router' {
   interface RouteMeta {
-    requiresAuth?: boolean,
-    requiredParams?: string[],
+    requiresAuth?: boolean
+    requiredParams?: string[]
   }
 }
 
@@ -35,7 +35,7 @@ const router = createRouter({
       name: ROUTE_NAME.FEED,
       component: () => import('@/views/FeedView.vue'),
       meta: {
-        requiresAuth: true,
+        requiresAuth: true
       }
     },
     {
@@ -44,7 +44,7 @@ const router = createRouter({
       component: () => import('@/views/ProfileView.vue'),
       meta: {
         requiredParams: ['id'],
-        requiresAuth: true,
+        requiresAuth: true
       }
     },
     {
@@ -52,7 +52,7 @@ const router = createRouter({
       name: ROUTE_NAME.SEARCH,
       component: () => import('@/views/SearchView.vue'),
       meta: {
-        requiresAuth: true,
+        requiresAuth: true
       }
     },
     {
@@ -60,7 +60,7 @@ const router = createRouter({
       name: ROUTE_NAME.SETTINGS,
       component: () => import('@/views/SettingsView.vue'),
       meta: {
-        requiresAuth: true,
+        requiresAuth: true
       }
     },
     {
@@ -68,54 +68,51 @@ const router = createRouter({
       name: ROUTE_NAME.CREATE_POST,
       component: () => import('@/views/CreatePost.vue'),
       meta: {
-        requiresAuth: true,
+        requiresAuth: true
       }
-    },
+    }
   ]
 })
 
 router.beforeEach(async (to, from, next) => {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session }
+  } = await supabase.auth.getSession()
 
-
-  if(to.meta.requiredParams?.length) {
-    const paramKeys = Object.keys(to.params);
-    const hasAllRequiredParams = to.meta.requiredParams.every(param => paramKeys.includes(param));
+  if (to.meta.requiredParams?.length) {
+    const paramKeys = Object.keys(to.params)
+    const hasAllRequiredParams = to.meta.requiredParams.every((param) => paramKeys.includes(param))
     if (!hasAllRequiredParams) {
-      return next({name: ROUTE_NAME.HOME});
+      return next({ name: ROUTE_NAME.HOME })
     }
   }
 
-  console.log('beforeEach:: session user', session?.user);
-  const userStore = useUser();
-  const { user, profile } = storeToRefs(userStore);
-  const { fetchUserProfile, fetchFollows } = userStore;
+  const userStore = useUser()
+  const { user, profile } = storeToRefs(userStore)
+  const { fetchUserProfile, fetchFollows } = userStore
 
   if (to.matched.some((res) => res.meta.requiresAuth)) {
     if (session?.user) {
-      user.value = session.user;
+      user.value = session.user
       if (user.value?.id !== profile.value?.id) {
         try {
-          await Promise.allSettled([
-            fetchUserProfile(),
-            fetchFollows(),
-          ]);
+          await Promise.allSettled([fetchUserProfile(), fetchFollows()])
         } catch (e) {
-          console.error(e);
+          console.error(e)
         }
       }
-      next();
-      return;
+      next()
+      return
     }
-    next({ name: ROUTE_NAME.LOGIN });
-    return;
+    next({ name: ROUTE_NAME.LOGIN })
+    return
   }
 
-  if(session?.user) {
-    return next({ name: ROUTE_NAME.FEED });
+  if (session?.user) {
+    return next({ name: ROUTE_NAME.FEED })
   }
 
-  next();
-});
+  next()
+})
 
 export default router

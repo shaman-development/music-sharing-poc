@@ -4,7 +4,10 @@ import supabase from '@/plugins/supabase'
 import {ROUTE_NAME} from '@/constants/router'
 import {useUser} from '@/stores/user'
 import {storeToRefs} from 'pinia'
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import {isNotificationPermitted, requestPermission} from "@/utils/notifications";
+import ReloadPrompt from '@/components/ReloadPrompt.vue'
+import NotificationPermissionPrompt from "@/components/NotificationPermissionPrompt.vue";
 
 const router = useRouter()
 const userStore = useUser()
@@ -20,12 +23,19 @@ const handleLogout = async () => {
 }
 
 const isNavigationOpen = ref(false);
+
+onMounted(async () => {
+  await requestPermission();
+})
 </script>
 
 <template>
+<!--  <ReloadPrompt />-->
+  <NotificationPermissionPrompt />
+
   <header class="header">
     <RouterLink class="header__link" :to="{ name: ROUTE_NAME.FEED }">
-      <img alt="Vue logo" class="header__logo" src="/disc-fill.svg" width="125" height="125"/>
+      <img alt="Vue logo" class="header__logo" src="/logo.svg" width="125" height="125"/>
     </RouterLink>
   </header>
 

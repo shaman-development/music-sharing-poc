@@ -25,7 +25,6 @@ export const useUser = defineStore('user', () => {
     if (error) throw new Error(error.message)
 
     profile.value = data[0]
-    console.log('fetchUserpRofile', data, profile.value)
   }
   const fetchFollows = async () => {
     if (!user.value) return
@@ -35,8 +34,6 @@ export const useUser = defineStore('user', () => {
       .select()
       .eq('follower_id', user.value.id)
 
-    console.log('fetchFollows', data, error)
-    console.log('fetchFollows', user.value.id)
     if (error) throw new Error(error.message)
 
     follows.value = data as Follow[]

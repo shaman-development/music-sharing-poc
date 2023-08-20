@@ -9,6 +9,10 @@
     "src/**/__tests__/*"
   ],
   "compilerOptions": {
+    "types": [
+      "vite-plugin-pwa/client",
+      "vite-plugin-pwa/vue"
+    ],
     "composite": true,
     "baseUrl": "./",
     "paths": {
